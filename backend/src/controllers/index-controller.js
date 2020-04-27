@@ -28,6 +28,7 @@ class IndexController{
             return res.send(this.utils.setResult(Types.Status.ERROR, 'error', error));
         }
     }
+    
 
     routes(){
         this.router.get("/", this.index.bind(this));

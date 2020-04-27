@@ -16,3 +16,15 @@ CREATE TABLE "user" (
     "uri" VARCHAR(128),
 	"createOn" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE "userToken" (
+	"userTokenId" SERIAL PRIMARY KEY NOT NULL,
+	"isActive" BOOL DEFAULT false NOT NULL,
+	"isDeleted" BOOL DEFAULT false NOT NULL,
+	"userId" INT,
+	"spotifyId" INT,
+    "accessToken" VARCHAR(255),
+    "refreshToken" VARCHAR(255),
+	"createOn" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

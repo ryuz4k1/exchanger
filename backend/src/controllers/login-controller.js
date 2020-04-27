@@ -4,6 +4,7 @@ const Types             = require("../helpers/types");
 const request           = require('request');
 const querystring       = require('querystring');
 const User              = require("../models/user-model");
+const UserToken         = require("../models/user-token-model");
 
 class IndexController {
     constructor(router) {
@@ -79,15 +80,8 @@ class IndexController {
 
                     // use the access token to access the Spotify Web API
                     request.get(options, async function (error, response, body) {
-                        let data = {
-                            body: body,
-                            accessToken: access_token,
-                            refreshToken: refresh_token
-                        };
 
-                        //return res.send(data);
-
-                        await User.create({
+                        let user = await User.create({
                             isActive: true,
                             isDeleted: false,
                             spotifyId: body.spotifyId,
@@ -103,10 +97,21 @@ class IndexController {
                             type: body.type,
                             uri: body.uri
                         });
-                        console.log(body);
+                        //console.log(body);
+
+                        await UserToken.create({
+                            isActive: true,
+                            isDeleted: false,
+                            userId: user.userId,
+                            spotifyId: user.spotifyId,
+                            accessToken: access_token,
+                            refreshToken: refresh_token
+                        });
+
+                        // return res.send(data);
                     });
 
-                    res.redirect('http://localhost:4200');
+                    res.redirect('http://localhost:4200/home/' + access_token + '/' + refresh_token);
 
                 } else {
                     res.redirect('/#' +
@@ -143,9 +148,34 @@ class IndexController {
     }
 
 
+    async getUrl(req, res){
+        try {
+            //console.log(req.body);
+
+            let result = await UserToken.findOne({
+                where: {
+                    accessToken: req.body.accessToken
+                }
+            });
+
+            let user = await User.findOne({
+                where: {
+                    userId: result.userId
+                }
+            });
+
+            return res.send(this.utils.setResult(Types.Status.SUCCESS, 'success', user));
+
+        } 
+        catch (error) {
+            return res.send(this.utils.setResult(Types.Status.ERROR, 'error', error));
+        }
+    }
+
     routes() {
         this.router.get("/login", this.login.bind(this));
         this.router.get("/callback", this.callback.bind(this));
+        this.router.post("/url", this.getUrl.bind(this));
     };
 
 };
