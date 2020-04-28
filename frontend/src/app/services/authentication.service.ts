@@ -17,13 +17,13 @@ export class AuthenticationService {
 
 
   
-  url(url, access_token, refresh_token) {  // <--- Notice that the parameter name became term instead of terms
+  url(url, access_token, refresh_token, optional?) {  // <--- Notice that the parameter name became term instead of terms
     return of(url).pipe(
        debounceTime(500),
        distinctUntilChanged(),
        tap(_ => (this.loading$.next(true))),
        switchMap(() => {
-         return this.http.post<any>(`${environment.api}/auth/url`, { url: url , accessToken: access_token, refreshToken: refresh_token});
+         return this.http.post<any>(`${environment.api}/spotify/url`, { url: url , optional: optional, accessToken: access_token, refreshToken: refresh_token});
        }),
        tap(_ => (this.loading$.next(false))),
   )}

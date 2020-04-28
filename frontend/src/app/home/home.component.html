@@ -3,9 +3,10 @@
         <form class="form" [formGroup]="validateForm" (ngSubmit)="login()">
             <img src="https://i.imgyukle.com/2020/04/27/rVEu8j.png" width="450" height="350">
             <h2 class="h3 mb-3 font-weight-normal">Clone Youtube playlist to Spotify</h2>
-            <input formControlName="url" name="url" id="urlinput" type="search" class="form-control" placeholder="Paste Youtube playlist url">
-            <button type="submit" [class.btn-disabled]="!validateForm.valid" [disabled]="!validateForm.valid">
-                <p style="text-align: center;">GO</p>
+            <input formControlName="url" name="url" id="urlinput" type="text" placeholder="Paste Youtube playlist url" label="Paste Youtube playlist url">
+            <input type="text" formControlName="optional" maxlength="20" id="custominput" placeholder="playlist name (optional)" label="optional custom alias">
+            <button type="submit">
+                <p style="text-align: center; ">GO</p>
             </button>
         </form>
 

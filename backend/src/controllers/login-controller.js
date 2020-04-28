@@ -80,35 +80,51 @@ class IndexController {
 
                     // use the access token to access the Spotify Web API
                     request.get(options, async function (error, response, body) {
+                        console.log(body);
 
-                        let user = await User.create({
-                            isActive: true,
-                            isDeleted: false,
-                            spotifyId: body.spotifyId,
-                            country: body.country,
-                            displayName: body.display_name,
-                            email: req.body.email,
-                            explicitContent: body.explicit_content,
-                            externalUrls: body.external_urls,
-                            followers: body.followers,
-                            href: body.href,
-                            images: body.images,
-                            product: body.product,
-                            type: body.type,
-                            uri: body.uri
-                        });
-                        //console.log(body);
+                        let user = await User.findOne({ where: { email: body.email }});
 
-                        await UserToken.create({
+                        if (user == null) {
+        
+                            user = await User.create({
+                                isActive: true,
+                                isDeleted: false,
+                                spotifyId: body.spotifyId,
+                                country: body.country,
+                                displayName: body.display_name,
+                                email: body.email,
+                                explicitContent: body.explicit_content,
+                                externalUrls: body.external_urls,
+                                followers: body.followers,
+                                href: body.href,
+                                images: body.images,
+                                product: body.product,
+                                type: body.type,
+                                uri: body.uri
+                            });
+
+                            await UserToken.create({
+                                isActive: true,
+                                isDeleted: false,
+                                userId: user.userId,
+                                spotifyId: user.spotifyId,
+                                accessToken: access_token,
+                                refreshToken: refresh_token
+                            });
+                        }
+                        UserToken.update({ 
                             isActive: true,
                             isDeleted: false,
                             userId: user.userId,
                             spotifyId: user.spotifyId,
                             accessToken: access_token,
                             refreshToken: refresh_token
-                        });
-
-                        // return res.send(data);
+                        }, 
+                        { 
+                            where: { 
+                                userId: user.userId
+                            }
+                        })
                     });
 
                     res.redirect('http://localhost:4200/home/' + access_token + '/' + refresh_token);
@@ -148,34 +164,11 @@ class IndexController {
     }
 
 
-    async getUrl(req, res){
-        try {
-            //console.log(req.body);
-
-            let result = await UserToken.findOne({
-                where: {
-                    accessToken: req.body.accessToken
-                }
-            });
-
-            let user = await User.findOne({
-                where: {
-                    userId: result.userId
-                }
-            });
-
-            return res.send(this.utils.setResult(Types.Status.SUCCESS, 'success', user));
-
-        } 
-        catch (error) {
-            return res.send(this.utils.setResult(Types.Status.ERROR, 'error', error));
-        }
-    }
+    
 
     routes() {
         this.router.get("/login", this.login.bind(this));
         this.router.get("/callback", this.callback.bind(this));
-        this.router.post("/url", this.getUrl.bind(this));
     };
 
 };

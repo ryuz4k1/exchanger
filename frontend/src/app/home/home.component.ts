@@ -15,6 +15,7 @@ export class HomeComponent implements OnInit {
   public loading$ = this.authService.loading$;
   public validateForm: FormGroup = new FormGroup({
     url: new FormControl('', [Validators.required]),
+    optional: new FormControl('')
   });
 
   public results: Observable<any[]>;
@@ -40,8 +41,7 @@ export class HomeComponent implements OnInit {
     console.log("Refresh Token --> ", refresh_token);
 
     if (this.validateForm.valid) {
-
-      this.authService.url(this.validateForm.value.url, access_token, refresh_token).subscribe(data => {
+      this.authService.url(this.validateForm.value.url, access_token, refresh_token, this.validateForm.value.optional).subscribe(data => {
         console.log(data)
         this.router.navigate(['/result']).then();
         }, err => {

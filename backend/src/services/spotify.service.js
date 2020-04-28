@@ -1,30 +1,30 @@
 "use strict";
 
 const axios   = require("axios");
+const request = require("request");
 const Types   = require("../helpers/types");
 const config  = require("../config.json"); 
 
 
-class DataService {
+class SpotifyService {
 
-    async createPlaylist(body) {
-
-        let url = process.env.SPOTIFY_API_URL + process.env.SPOTIFY_USER_ID  + "/playlists"
-        console.log(url);
+    async createPlaylist(userId, myBody, token) {
+        // console.log(userId,body,token)
+        let url = process.env.SPOTIYF_API_URL_PLAYLIST + '/'  + userId  + "/playlists"
         const options = {
             url: url,
-            data: body,
+            data: myBody,
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + process.env.SPOTIFY_TOKEN
+                "Authorization": "Bearer " + token
             },
             method: "POST"
         }
-
-        const response = await axios(options);
+        const response = await request.post(options);
+        console.log(response.data);
         return response.data;
     }
 
 }
 
-module.exports = DataService;
+module.exports = SpotifyService;
