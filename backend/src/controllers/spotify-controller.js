@@ -4,6 +4,7 @@ const Types             = require("../helpers/types");
 const SportifyService   = require("../services/spotify.service");
 const User              = require("../models/user-model");
 const UserToken         = require("../models/user-token-model");
+const YoutubeService    = require("../services/youtube.service");
 
 class SpotifyController{
     constructor(router){
@@ -12,6 +13,7 @@ class SpotifyController{
         
         this.utils = new Utils();
         this.spotifyService = new SportifyService();
+        this.youtubeService = new YoutubeService();
     }
 
     // async create(req, res) {
@@ -33,6 +35,7 @@ class SpotifyController{
 
     async getUrl(req, res) {
         try {
+            console.log(req.body)
             let result = await UserToken.findOne({
                 where: {
                     accessToken: req.body.accessToken
@@ -56,12 +59,24 @@ class SpotifyController{
                     "description": req.body.optional + " description",
                     "public": true
                   }
-            }   
+            } 
 
-            const playlistResult = await this.spotifyService.createPlaylist(user.displayName, myBody, req.body.accessToken);
+            //const playlistResult = await this.spotifyService.createPlaylist(user.displayName, myBody, req.body.accessToken);
+            let getVideoUrls = await this.youtubeService.getPlaylistVideos(req.body.playlistUrl);
+            getVideoUrls.map(data => {
+                this.spotifyService.getSpotifyUri(data.name, req.body.accessToken)
+                //this.spotifyService.addSongToPlaylist(videoUrl)
+            });
+            //this.spotifyService.getSpotifyUri(req.body.accessToken)
+
+           
+            // let connectYoutube = this.youtubeService.loginYoutube();
+            // connectYoutube.then(data => {
+            //     console.log(data)
+            // });
             //console.log(playlistResult);
 
-            return res.send(this.utils.setResult(Types.Status.SUCCESS, 'success', playlistResult));
+            return res.send(this.utils.setResult(Types.Status.SUCCESS, 'success', "playlistResult"));
 
         } 
         catch (error) {

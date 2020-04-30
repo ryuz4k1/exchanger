@@ -19,7 +19,7 @@ class IndexController {
         res.cookie(process.env.SPOTIFY_STATE_KEY, randomState);
 
         // your application requests authorization
-        let scope = 'user-read-private user-read-email';
+        let scope = 'user-read-private user-read-email playlist-modify-public';
         res.redirect(process.env.SPOTIFY_AUTH_URL +
             querystring.stringify({
                 response_type: 'code',
